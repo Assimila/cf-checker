@@ -1,9 +1,9 @@
 package:
   name: cfchecker
-  version: "3.1.0.1"
+  version: "3.1.0.2"
 
 source:
-  git_rev: 3.1.0.1
+  git_rev: 3.1.0.2
   git_url: https://github.com/Assimila/cfchecker.git
 
 requirements:
