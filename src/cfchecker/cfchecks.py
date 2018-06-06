@@ -121,37 +121,44 @@ class CFVersion(object):
     def __str__(self):
         return "CF-%s" % ".".join(map(str, self.tuple))
 
-
-    def __cmp__(self, other):
-
-        # maybe overkill but allow for different lengths in future e.g. 3.2 and 3.2.1
-        pos = 0
-        while True:
-            in_s = (pos < len(self.tuple))
-            in_o = (pos < len(other.tuple))
-            if in_s:
-                if in_o:
-                    c = cmp(self.tuple[pos], other.tuple[pos])
-                    if c != 0:
-                        return c  # e.g. 1.x <=> 1.y
-                else:  # in_s and not in_o
-                    return 1  # e.g. 3.2.1 > 3.2
-            else:
-                if in_o:  # and not in_s
-                    return -1  # e.g. 3.2 < 3.2.1
-                else:  # not in_s and not in_o
-                    return 0  # e.g. 3.2 == 3.2
-            pos += 1
-
+    # =====================================================================================
+    # Deprecated in Python 3: use normal <, > & = symbols
+    # Rich comparison methods have supplanted cmp()
+    # see https://stackoverflow.com/questions/15556813/python-why-cmp-is-useful
+    # =====================================================================================
+    # def __cmp__(self, other):
+    #
+    #     # maybe overkill but allow for different lengths in future e.g. 3.2 and 3.2.1
+    #     pos = 0
+    #     while True:
+    #         in_s = (pos < len(self.tuple))
+    #         in_o = (pos < len(other.tuple))
+    #         if in_s:
+    #             if in_o:
+    #                 c = cmp(self.tuple[pos], other.tuple[pos])
+    #                 if c != 0:
+    #                     return c  # e.g. 1.x <=> 1.y
+    #             else:  # in_s and not in_o
+    #                 return 1  # e.g. 3.2.1 > 3.2
+    #         else:
+    #             if in_o:  # and not in_s
+    #                 return -1  # e.g. 3.2 < 3.2.1
+    #             else:  # not in_s and not in_o
+    #                 return 0  # e.g. 3.2 == 3.2
+    #         pos += 1
+    #
+    # =====================================================================================
     def __ge__(self, other):
-        if self.__cmp__(other) >= 0:
-	        return True
-        return False
+        # if self.__cmp__(other) >= 0:
+        #    return True
+        # return False
+        return self.tuple > other.tuple
 
     def __lt__(self, other):
-        if self.__cmp__(other) < 0:
-            return True
-        return False
+        # if self.__cmp__(other) < 0:
+        #     return True
+        # return False
+        return self.tuple < other.tuple
 
 vn1_0 = CFVersion((1, 0))
 vn1_1 = CFVersion((1, 1))
@@ -1585,7 +1592,7 @@ class CFChecker:
 
     for attribute in str_global_attrs:
         if hasattr(self.f, attribute):
-	        if isnt_str_or_basestring(self.f.getncattr(attribute)):
+            if isnt_str_or_basestring(self.f.getncattr(attribute)):
                 self._add_error("Global attribute %s must be of type 'String'" % attribute,
                                 code="2.6.2")
 
@@ -2975,14 +2982,24 @@ def getargs(arglist):
     cacheTime = 24*3600
     # default directory to store cached tables
     cacheDir = '/tmp'
-    
+
+    # =====================================================================================
+    # environ.has_key() deprecated in Python3
+    # if environ.has_key(standardnamekey):
+    #     standardname=environ[standardnamekey]
+    # if environ.has_key(areatypeskey):
+    #     areatypes=environ[areatypeskey]
+    # if environ.has_key(regionnameskey):
+    #     regionnames=environ[regionnameskey]
+
     # set to environment variables
-    if environ.has_key(standardnamekey):
+    if environ.get(standardnamekey) is not None:
         standardname=environ[standardnamekey]
-    if environ.has_key(areatypeskey):
+    if environ.get(areatypeskey) is not None:
         areatypes=environ[areatypeskey]
-    if environ.has_key(regionnameskey):
+    if environ.get(regionnameskey) is not None:
         regionnames=environ[regionnameskey]
+    # =====================================================================================
 
     try:
         (opts,args)=getopt(arglist[1:],'a:bcdhlnr:s:t:v:x',
